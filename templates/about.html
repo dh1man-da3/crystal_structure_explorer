@@ -1,0 +1,116 @@
+{% extends "base.html" %}
+
+{% block title %}About — {{ project_info.project.title }}{% endblock %}
+{% block description %}The academic project, student team and technologies behind Crystal Structure Explorer.{% endblock %}
+
+{% block content %}
+{% set project = project_info.project %}
+<main id="main-content" class="page-shell content-page about-page">
+  <header class="about-hero">
+    <span class="eyebrow">About the Project</span>
+    <h1>{{ project.title }}</h1>
+    <p class="about-lede">An interactive 3D solid-state physics project for exploring SC, BCC, FCC and HCP crystal structures.</p>
+    <p class="about-academic-line">Developed for {{ project.subject }} · {{ project.programme }} · {{ project.semester }} · {{ project.institution }}</p>
+    <div class="about-formal-title">
+      <span>Academic project title</span>
+      <p>{{ project.academic_title }}</p>
+    </div>
+  </header>
+
+  <section class="about-section content-section" aria-labelledby="about-context-heading">
+    <h2 id="about-context-heading">Academic Context</h2>
+    <dl class="about-meta-grid">
+      <div><dt>University</dt><dd>{{ project.institution }}</dd></div>
+      <div><dt>Programme</dt><dd>{{ project.programme }}</dd></div>
+      <div><dt>Semester</dt><dd>{{ project.semester }}</dd></div>
+      <div><dt>Course</dt><dd>{{ project.subject }}</dd></div>
+      <div><dt>Course Code</dt><dd>{{ project.course_code }}</dd></div>
+      <div><dt>Submitted To</dt><dd>{{ project.submitted_to }}</dd></div>
+    </dl>
+  </section>
+
+  <section class="about-section" aria-labelledby="about-project-heading">
+    <h2 id="about-project-heading">What is {{ project.title }}?</h2>
+    <div class="about-copy">
+      <p>{{ project.title }} is the interactive educational application developed for <em>{{ project.academic_title }}</em>. It makes Simple Cubic (SC), Body-Centred Cubic (BCC), Face-Centred Cubic (FCC) and Hexagonal Close-Packed (HCP) structures easier to understand by connecting 3D geometry with lattice parameters, coordination number, atomic packing factor, nearest-neighbour distance and effective atoms per cell.</p>
+      <p>The aim is to move beyond static textbook diagrams: students can rotate and inspect structures, compare unit cells with larger crystal regions, explore coordination shells and stacking, and try real-material parameters.</p>
+    </div>
+    <ul class="about-feature-strip" aria-label="Project highlights">
+      <li>Interactive 3D</li><li>Four crystal structures</li>
+      <li>Physics-driven calculations</li><li>Real material presets</li>
+    </ul>
+  </section>
+
+  <section class="about-section about-team-section" aria-labelledby="about-team-heading">
+    <h2 id="about-team-heading">Project Team</h2>
+    <div class="team-grid">
+      {% for member in project_info.team %}
+      <article class="team-card">
+        <div class="team-portrait">
+          <img src="{{ url_for('static', filename=member.image) }}" alt="Portrait of {{ member.name }}" width="1254" height="1254">
+        </div>
+        <div class="team-details">
+          <h3>{{ member.name }}</h3>
+          <p class="team-uid">UID {{ member.uid }}</p>
+          <p class="team-programme">{{ project.programme }}</p>
+          <p class="team-member-label">Project Team Member</p>
+        </div>
+      </article>
+      {% endfor %}
+    </div>
+  </section>
+
+  <section class="about-section content-section" aria-labelledby="about-technologies-heading">
+    <h2 id="about-technologies-heading">Built With</h2>
+    <ul class="technology-list" aria-label="Technologies used">
+      {% for technology in project_info.technologies %}<li>{{ technology }}</li>{% endfor %}
+    </ul>
+    <div class="about-copy">
+      <p>Python and NumPy provide the scientific calculations, Flask serves the application and API, and Three.js renders the interactive crystal geometry in the browser.</p>
+      <p>KaTeX renders mathematical relations, while pytest validates the scientific model and API.</p>
+      <p>The project is live as a website hosted on Render.</p>
+    </div>
+  </section>
+
+  <section class="about-section" aria-labelledby="about-coursework-heading">
+    <h2 id="about-coursework-heading">Connection to Previous Coursework</h2>
+    <p class="about-coursework-intro">The project combines concepts and practical skills developed across several earlier courses in the B.Sc. Physics programme.</p>
+    <div class="coursework-grid">
+      <article class="coursework-card">
+        <h3>Introduction to Scientific Computing</h3>
+        <p>Scientific-computing skills turn solid-state physics equations and geometry into executable numerical models. NumPy represents lattice vectors, converts fractional and Cartesian coordinates, and supports neighbour-distance, cell-volume and packing calculations checked by scientific tests.</p>
+      </article>
+      <article class="coursework-card">
+        <h3>Introduction to Python Programming</h3>
+        <p>Python is the project's main scientific and backend language. Functions, modules, lists and dictionaries support reusable geometry helpers, input validation, JSON handling and application logic.</p>
+      </article>
+      <article class="coursework-card">
+        <h3>Data Visualization with Python</h3>
+        <p>Visualization principles help turn numerical data into understandable representations through meaningful colors, legends, labels and property comparisons. Here these principles are applied in an interactive 3D web environment rendered by Three.js, rather than a Python plotting library.</p>
+      </article>
+      <article class="coursework-card">
+        <h3>Data Science with Python</h3>
+        <p>The connection is structured scientific data handling and validation: organizing material-property records in <code>materials.json</code>, deriving values from source parameters and checking consistency across SC, BCC, FCC and HCP comparisons. This is not a machine-learning or large-data project.</p>
+      </article>
+      <article class="coursework-card">
+        <h3>Web Development with Python</h3>
+        <p>Flask routes, Jinja templates and JSON API endpoints expose the scientific Python model to the browser while keeping backend and frontend separate. Flask also serves CSS, JavaScript and images for the responsive, multi-page interface.</p>
+      </article>
+    </div>
+    <aside class="coursework-assistance" aria-labelledby="about-ai-heading">
+      <h3 id="about-ai-heading">Additional Technologies &amp; AI Assistance</h3>
+      <p>Technologies beyond the team's previous coursework—particularly JavaScript, Three.js and WebGL-based interactive 3D rendering, along with KaTeX, native fullscreen and stencil-buffer clipping caps—were implemented with assistance from OpenAI Codex.</p>
+      <p>Codex served as a development assistant for implementation, debugging and integration. Project requirements, the scientific model, testing and final verification were developed and reviewed as part of the project work; scientific results were checked rather than accepted solely from AI output.</p>
+    </aside>
+  </section>
+
+  <section class="about-section content-section about-submission" aria-labelledby="about-submission-heading">
+    <div>
+      <h2 id="about-submission-heading">Academic Submission</h2>
+      <p>Developed as a {{ project.semester }} group project for the core course {{ project.subject }} ({{ project.course_code }}), {{ project.programme }}, {{ project.institution }}.</p>
+      <p class="about-submitted-to">Submitted to {{ project.submitted_to }}, the subject professor for {{ project.subject }}.</p>
+    </div>
+    <a class="about-explorer-link" href="https://github.com/dh1man-da3/crystal_structure_explorer" target="_blank" rel="noopener noreferrer">Open GitHub Repository <span aria-hidden="true">↗</span></a>
+  </section>
+</main>
+{% endblock %}

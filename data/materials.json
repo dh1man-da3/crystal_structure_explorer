@@ -1,0 +1,125 @@
+{
+  "materials": [
+    {
+      "id": "alpha-polonium",
+      "name": "α-Polonium",
+      "symbol": "Po",
+      "structure": "sc",
+      "atomic_number": 84,
+      "atomic_mass_g_mol": 208.9824308,
+      "atomic_mass_note": "Po has no standard atomic weight. This Po-209 isotope mass is a representative value for the model density; the cited crystal study used a Po-208/Po-209 mixture.",
+      "lattice": {"a_angstrom": 3.359},
+      "space_group": {"symbol": "Pm-3m", "number": 221},
+      "phase_note": "α-Po is the low-temperature simple-cubic phase; β-Po is rhombohedral.",
+      "conditions": "DeSando and Lange's X-ray study used a Po-208/Po-209 isotope mixture in helium; a = 3.359 ± 0.001 Å. A measurement temperature was not specified in the accessible abstract.",
+      "sources": [
+        {
+          "property": "crystal_structure_and_lattice",
+          "name": "DeSando and Lange (1966)",
+          "url": "https://www.sciencedirect.com/science/article/pii/0022190266802701",
+          "reference": "R. DeSando and R. Lange, Journal of Inorganic and Nuclear Chemistry 28, 1837–1846 (1966), doi:10.1016/0022-1902(66)80270-1."
+        },
+        {
+          "property": "space_group_and_phase",
+          "name": "AFLOW Encyclopedia of Crystallographic Prototypes",
+          "url": "https://aflow.org/p/A_cP1_221_a-001/",
+          "reference": "α-Po simple-cubic prototype A_cP1_221_a-001, space group Pm-3m (No. 221)."
+        },
+        {
+          "property": "atomic_mass",
+          "name": "NIST Atomic Weights and Isotopic Compositions",
+          "url": "https://physics.nist.gov/cgi-bin/Compositions/stand_alone.pl?ascii=ascii&ele=Po",
+          "reference": "Po-209 relative atomic mass 208.9824308(20)."
+        },
+        {
+          "property": "atomic_weight_caveat",
+          "name": "CIAAW Standard Atomic Weights",
+          "url": "https://www.ciaaw.org/atomic-weights.htm",
+          "reference": "CIAAW lists no standard atomic weight for polonium."
+        }
+      ]
+    },
+    {
+      "id": "alpha-iron",
+      "name": "α-Iron (ferrite)",
+      "symbol": "Fe",
+      "structure": "bcc",
+      "atomic_number": 26,
+      "atomic_mass_g_mol": 55.845,
+      "lattice": {"a_angstrom": 2.8665},
+      "space_group": {"symbol": "Im-3m", "number": 229},
+      "phase_note": "α-Fe (ferrite), the ambient-pressure body-centered-cubic phase.",
+      "conditions": "AIST tabulates a = 2.8665(1) Å at 25 °C, citing von Batchelder and Raeuchle (1954).",
+      "sources": [
+        {
+          "property": "crystal_structure_and_lattice",
+          "name": "AIST Crystal Structure Gallery",
+          "url": "https://unit.aist.go.jp/mmri/ja/organization/db-nomura/common/struc-coord/Fe-c.html",
+          "reference": "F. W. von Batchelder and R. F. Raeuchle, Acta Crystallographica 7, 464 (1954); AIST entry at 25 °C."
+        },
+        {
+          "property": "atomic_mass",
+          "name": "CIAAW Abridged Standard Atomic Weights",
+          "url": "https://www.ciaaw.org/abridged-atomic-weights.htm",
+          "reference": "Fe abridged standard atomic weight 55.845 ± 0.002 (2024 table)."
+        }
+      ]
+    },
+    {
+      "id": "copper",
+      "name": "Copper",
+      "symbol": "Cu",
+      "structure": "fcc",
+      "atomic_number": 29,
+      "atomic_mass_g_mol": 63.546,
+      "lattice": {"a_angstrom": 3.6148},
+      "space_group": {"symbol": "Fm-3m", "number": 225},
+      "phase_note": "Ambient-pressure face-centered-cubic copper.",
+      "conditions": "AIST tabulates a = 3.6148 Å at 18 °C, citing Rothery and Andrews (1942).",
+      "sources": [
+        {
+          "property": "crystal_structure_and_lattice",
+          "name": "AIST Crystal Structure Gallery",
+          "url": "https://unit.aist.go.jp/mmri/ja/organization/db-nomura/common/struc-coord/Cu-c.html",
+          "reference": "AIST crystal-structure record at 18 °C, citing work by Rothery and Andrews (1942); the original lattice unit was converted to ångströms by AIST."
+        },
+        {
+          "property": "atomic_mass",
+          "name": "CIAAW Abridged Standard Atomic Weights",
+          "url": "https://www.ciaaw.org/abridged-atomic-weights.htm",
+          "reference": "Cu abridged standard atomic weight 63.546 ± 0.003 (2024 table)."
+        }
+      ]
+    },
+    {
+      "id": "magnesium",
+      "name": "Magnesium",
+      "symbol": "Mg",
+      "structure": "hcp",
+      "atomic_number": 12,
+      "atomic_mass_g_mol": 24.305,
+      "lattice": {
+        "a_angstrom": 3.2094,
+        "c_angstrom": 5.2105,
+        "c_over_a": 1.6235121829625474
+      },
+      "space_group": {"symbol": "P63/mmc", "number": 194},
+      "phase_note": "Ambient-pressure hexagonal-close-packed magnesium; the measured c/a differs from the ideal HCP ratio.",
+      "conditions": "AIST tabulates a = 3.2094(2) Å and c = 5.2105(4) Å at 25 °C, citing Straumanis (1949). The c/a field is derived from those two values.",
+      "sources": [
+        {
+          "property": "crystal_structure_and_lattice",
+          "name": "AIST Crystal Structure Gallery",
+          "url": "https://unit.aist.go.jp/mmri/ja/organization/db-nomura/common/struc-coord/Mg-c.html",
+          "reference": "M. E. Straumanis, Journal of Applied Physics 20, 726 (1949); AIST entry at 25 °C."
+        },
+        {
+          "property": "atomic_mass",
+          "name": "CIAAW Abridged Standard Atomic Weights",
+          "url": "https://www.ciaaw.org/abridged-atomic-weights.htm",
+          "reference": "Mg abridged standard atomic weight 24.305 ± 0.002 (2024 table)."
+        }
+      ]
+    }
+  ]
+}

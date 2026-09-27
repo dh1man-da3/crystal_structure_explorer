@@ -1,0 +1,28 @@
+{
+  "project": {
+    "title": "Crystal Structure Explorer",
+    "academic_title": "3D Interactive SC-BCC-FCC-HCP Crystal Structure Model",
+    "institution": "Chandigarh University",
+    "programme": "B.Sc. Physics",
+    "semester": "Semester 5",
+    "subject": "Solid State Physics",
+    "course_code": "24SPT-301",
+    "type": "Core-course group project",
+    "submitted_to": "Dr. Sumit Bhardwaj"
+  },
+  "team": [
+    {
+      "name": "Dhiman Das",
+      "uid": "24BSP70022",
+      "image": "images/team/dhiman.png"
+    },
+    {
+      "name": "Tanmay Sharma",
+      "uid": "24BSP70007",
+      "image": "images/team/tanmay.png"
+    }
+  ],
+  "technologies": [
+    "Python", "NumPy", "Flask", "HTML", "CSS", "JavaScript", "Three.js", "KaTeX", "pytest"
+  ]
+}

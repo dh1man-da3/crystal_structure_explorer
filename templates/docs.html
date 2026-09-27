@@ -1,0 +1,242 @@
+{% extends "base.html" %}
+
+{% block title %}Documentation — Crystal Structure Explorer{% endblock %}
+{% block description %}How to use Crystal Structure Explorer, understand its crystal geometry and scientific properties, and interpret its material data.{% endblock %}
+{% block head_assets %}
+    <link rel="stylesheet" href="{{ url_for('static', filename='vendor/katex/katex.min.css') }}">
+{% endblock %}
+
+{% block content %}
+<main class="page-shell content-page docs-page" id="main-content">
+  <header class="page-header">
+    <span class="eyebrow">Project guide</span>
+    <h1>Documentation</h1>
+    <p>A guide to using the explorer and interpreting the physics behind its four crystal structures.</p>
+  </header>
+
+  <div class="docs-layout">
+    <nav class="docs-toc" aria-label="On this page">
+      <h2>On this page</h2>
+      <ol>
+        <li><a href="#overview">Overview</a></li>
+        <li><a href="#getting-started">Getting Started</a></li>
+        <li><a href="#viewer">Using the 3D Viewer</a></li>
+        <li><a href="#visualization-modes">Visualization Modes</a></li>
+        <li><a href="#structures">Crystal Structures</a></li>
+        <li><a href="#lattice-parameters">Lattice Parameters</a></li>
+        <li><a href="#unit-cells">Unit Cells and Supercells</a></li>
+        <li><a href="#properties">Scientific Properties</a></li>
+        <li><a href="#coordinates">Coordinate System</a></li>
+        <li><a href="#materials">Real Material Presets</a></li>
+        <li><a href="#hcp">HCP Convention</a></li>
+        <li><a href="#viewer-controls">Viewer Controls</a></li>
+        <li><a href="#relations">Mathematical Relations</a></li>
+        <li><a href="#data-sources">Data Sources</a></li>
+        <li><a href="#architecture">Software Architecture</a></li>
+        <li><a href="#limitations">Assumptions and Limitations</a></li>
+        <li><a href="#troubleshooting">Troubleshooting</a></li>
+      </ol>
+    </nav>
+
+    <article class="docs-article prose">
+      <section class="content-section" id="overview">
+        <h2>Overview</h2>
+        <p>Crystal Structure Explorer is a local educational simulator for simple cubic (SC), body-centered cubic (BCC), face-centered cubic (FCC), and hexagonal close-packed (HCP) lattices. Four views let you inspect finite crystals, one unit cell, a coordination shell, or atomic-layer stacking. Python calculates the geometry and solid-state properties. You can explore a generic lattice or one of four cited elemental presets, and click a site to inspect its coordinates.</p>
+        <p>The spheres show an idealized arrangement of equivalent lattice sites, not a measurement of real atomic surfaces. For calculations, the Python model is authoritative; Three.js draws the coordinates returned by Flask.</p>
+      </section>
+
+      <section class="content-section" id="getting-started">
+        <h2>Getting Started</h2>
+        <ol>
+          <li>Open the <a href="{{ url_for('index') }}">Explorer</a>, choose SC, BCC, FCC, or HCP, and select a <strong>View</strong>.</li>
+          <li>Select a cited material preset or leave <strong>Custom / Generic</strong> selected.</li>
+          <li>Change lattice constant <span data-tex='a'>a</span>; for HCP you can also change <span data-tex='c/a'>c/a</span> and choose a 1 × 1 through 4 × 4 basal prism cluster. Cubic structures have a separate 1 × 1 × 1 through 4 × 4 × 4 supercell selector.</li>
+          <li>Rotate, zoom, or pan the model. In Crystal, Coordination, or Stacking view, click a sphere to inspect that site's coordinates.</li>
+          <li>Read the calculated quantities and, for a real-material preset, the theoretical density in the Properties panel.</li>
+        </ol>
+        <p>Changing a preset's lattice parameter switches it back to Custom / Generic. Changing only the cubic supercell size or HCP prism-cluster size keeps the selected preset.</p>
+      </section>
+
+      <section class="content-section" id="viewer">
+        <h2>Using the 3D Viewer</h2>
+        <p>Left-drag to orbit, scroll or pinch to zoom, and right-drag to pan. In Crystal, Coordination, or Stacking view, click or tap a visible sphere to highlight it. The Selected Site inspector then reports the display-site ID, its geometric role, lattice coordinates, and Cartesian coordinates. Click empty space or use <strong>Clear selection</strong> to dismiss it. Changing the structure or a parameter also clears the selection.</p>
+        <p>In Crystal and Unit Cell views, displayed spheres include shared boundary sites. They are not all independent atoms belonging solely to that drawing. In Stacking, layer separation moves spheres only for presentation; Selected Site coordinates remain the original crystallographic coordinates. Cell lines, contact diagonals, axes, and the camera are visual aids; changing them never changes the calculated lattice.</p>
+      </section>
+
+      <section class="content-section" id="visualization-modes">
+        <h2>Visualization Modes</h2>
+        <p>Use the Explorer's <strong>View</strong> control to ask four different questions about the same Python-calculated crystal. Changing the view changes the educational geometry, not the material preset or intrinsic properties.</p>
+        <h3>Crystal</h3>
+        <p>Explore a finite repeated crystal. For SC, BCC, and FCC, a size <span data-tex='N'>N</span> block contains <span data-tex='N\times N\times N'>N × N × N</span> conventional cubic cells. HCP uses a separate <span data-tex='N\times N'>N × N</span> basal cluster of one-prism-high educational hexagonal cells. Shared boundary sites close the visible cells; they do not change the effective atom count.</p>
+        <h3>Unit Cell</h3>
+        <p>Inspect one conventional cubic cell or one educational HCP prism. Spheres use the Python-calculated hard-sphere touching radius <span data-tex='r=d_{\mathrm{nn}}/2'>r = dₙₙ/2</span>; Atom Size does not scale them in this view. A cubic corner sphere contributes only <span data-tex='\frac18'>1/8</span> to one cube, while a face-centred sphere contributes <span data-tex='\frac12'>1/2</span>. Thus SC has <span data-tex='8\left(\frac18\right)=1'>8 × 1/8 = 1</span> effective atom, BCC has <span data-tex='8\left(\frac18\right)+1=2'>8 × 1/8 + 1 = 2</span>, and FCC has <span data-tex='8\left(\frac18\right)+6\left(\frac12\right)=4'>8 × 1/8 + 6 × 1/2 = 4</span>. In the HCP prism, <span data-tex='12\left(\frac16\right)+2\left(\frac12\right)+3=6'>12 × 1/6 + 2 × 1/2 + 3 = 6</span> effective atoms come from shared corners, basal-face centres, and interior sites. The three B-layer site centres count fully even when parts of their physical spheres extend across a side plane; site sharing is not the same as clipped sphere volume.</p>
+        <p>With <strong>Clip at Cell Walls</strong> on (the default), portions of hard spheres outside the cell are clipped, and the exposed cut faces are filled so the visible pieces look solid. Turn it off to see the same full physical spheres extending beyond the cell. Clipping is a drawing operation: toggling it does not change site coordinates, the touching radius, effective atom counts, or the scientific density calculation. The single-cell outline stays visible to make each fractional contribution clear.</p>
+        <p>Site selection is intentionally disabled in Unit Cell view so the clipped hard-sphere geometry remains visually clear.</p>
+        <h3>Coordination</h3>
+        <p>Inspect one central site and its standard surrounding shell rather than a cell block. <strong>Coordination number</strong> counts the neighbours around that central site: SC has 6, BCC has 8, FCC has 12, and ideal HCP has 12. <strong>Neighbour Lines</strong> connect the centre to each displayed shell site; they are geometric nearest-neighbour guides, <strong>not chemical bond predictions</strong>. Turn the lines off to inspect the sites alone.</p>
+        <p>Turn on <strong>Polyhedron</strong> to join the neighbour centres into a translucent coordination polyhedron; the central atom is inside it, not a vertex. The ideal shell forms an <strong>octahedron</strong> for SC, a <strong>cube</strong> for BCC, a <strong>cuboctahedron</strong> for FCC, and an <strong>anticuboctahedron</strong> for HCP. FCC and ideal HCP both have 12 neighbours, but those neighbours have different arrangements, so their polyhedra are not the same.</p>
+        <p>For non-ideal HCP <span data-tex='c/a'>c/a</span>, the standard twelve-site shell remains visible, but its actual neighbour distances can split into groups. The polyhedron follows the current geometry rather than forcing a regular ideal shape. At extreme ratios outside the UI range, this standard shell need not be the literal twelve closest sites.</p>
+        <h3>Stacking</h3>
+        <p>Compare three consecutive atomic layers, separated on screen to reveal their registries. SC shows directly aligned square layers, <strong>AAA along [001]</strong>. BCC shows alternating shifted square layers, <strong>ABAB along [001]</strong>; neither SC nor BCC is close-packed. FCC shows triangular close-packed planes, <strong>ABCABC along [111]</strong>. HCP shows triangular basal planes, <strong>ABAB along [0001]</strong>. FCC and ideal HCP share the same close-packed atomic packing factor (about 0.7405), but differ in their third-layer registry: FCC goes to C, HCP returns to A.</p>
+        <p><strong>Layer Separation</strong> is a presentation-only control. At 100%, planes have their natural crystallographic spacing; increasing the value spreads them apart visually without changing the original Cartesian coordinates shown in Selected Site or the calculated properties.</p>
+      </section>
+
+      <section class="content-section" id="structures">
+        <h2>Crystal Structures</h2>
+        <h3>Simple Cubic (SC)</h3>
+        <p>Sites occupy cubic corners. Shared-corner accounting gives one effective atom per conventional cell. Each site has six nearest neighbours; the hard-sphere packing factor is about 0.5236. α-Polonium is the representative elemental preset.</p>
+        <h3>Body-Centered Cubic (BCC)</h3>
+        <p>BCC adds one site at the center of each cubic cell. It has two effective atoms per conventional cell, coordination number 8, and packing factor about 0.6802. The preset is α-Iron (ferrite).</p>
+        <h3>Face-Centered Cubic (FCC)</h3>
+        <p>FCC adds a site at the center of every cubic face. Shared-face accounting gives four effective atoms per conventional cell. It is close-packed, with coordination number 12, packing factor about 0.7405, and ABC close-packed layer stacking. Copper is the preset.</p>
+        <h3>Hexagonal Close-Packed (HCP)</h3>
+        <p>HCP has aligned A layers separated by an offset B layer: ABAB stacking. The familiar hexagonal prism has six effective atoms; the computational primitive basis has two. Ideal HCP has coordination number 12 and packing factor about 0.7405. Magnesium is the preset. A non-ideal <span data-tex='c/a'>c/a</span> can split the neighbour distances, so those ideal statements need that qualification.</p>
+      </section>
+
+      <section class="content-section" id="lattice-parameters">
+        <h2>Lattice Parameters</h2>
+        <p>For the cubic structures, <span data-tex='a=b=c'>a = b = c</span>, and all cell angles are 90°. Changing <span data-tex='a'>a</span> scales the coordinates and all distances; it does not change the structure type or its standard coordination number.</p>
+        <p>For HCP, the basal lengths are equal but the prism height can differ: <span data-tex='a=b\ne c'>a = b ≠ c</span> and <span data-tex='c=a(c/a)'>c = a × (c/a)</span>. The two primitive basal vectors meet at 120°. Changing <span data-tex='c/a'>c/a</span> changes the vertical geometry and may change which pairs are closest.</p>
+        <p>The current interface allows <span data-tex='2\le a\le 6\,\text{\AA}'>2–6 Å</span> and, for HCP, <span data-tex='1.2\le c/a\le 2.0'>1.2–2.0</span>. These are practical control ranges, not extra restrictions imposed by the scientific API.</p>
+      </section>
+
+      <section class="content-section" id="unit-cells">
+        <h2>Unit Cells and Supercells</h2>
+        <p>The cubic size selector repeats a conventional cell <span data-tex='N\times N\times N'>N × N × N</span> times, for <span data-tex='N=1,2,3,4'>N = 1–4</span>. The scientific generator lists one copy of each basis position in a half-open periodic supercell. The finite educational drawing also shows shared sites on its far faces, edges, and corners so every displayed cell is visually closed.</p>
+        <p>For SC at size 3, there are 27 unit cells and 27 generated periodic basis positions. Three cell intervals need four lattice-point planes along each edge, so the complete visible block contains <span data-tex='4^3=64'>4³ = 64</span> spheres. It is still a <strong>3 × 3 × 3 cell block</strong>, not a 4 × 4 × 4 one. The extra visible boundary sites do not change the effective count of one atom per SC unit cell.</p>
+        <p>For BCC and FCC, Python likewise adds and deduplicates the appropriate shared corner or face sites for the finite display. The <strong>All Cells</strong> line mode outlines every conventional cubic cell. HCP instead has its own <span data-tex='N\times N'>N × N</span> basal-prism cluster control: prisms are one layer high, share edges, and have Python-generated, deduplicated sites and cell lines. This is a display size, separate from the primitive periodic-supercell <code>size</code> used by the scientific API.</p>
+      </section>
+
+      <section class="content-section" id="properties">
+        <h2>Scientific Properties</h2>
+        <dl class="docs-definitions">
+          <dt>Coordination number</dt>
+          <dd>The number of nearest neighbours in the ideal infinite structure. The displayed HCP value of 12 is the ideal close-packed reference; at non-ideal <span data-tex='c/a'>c/a</span>, not all twelve surrounding sites need be equidistant.</dd>
+          <dt>Atomic packing factor (APF)</dt>
+          <dd>The fraction of the computational cell volume filled by equal, touching hard spheres: <span data-tex='\mathrm{APF}=\frac{n(4\pi r^3/3)}{V}'>APF = n(4πr³/3)/V</span>. It is dimensionless. For non-ideal HCP, the model uses the shortest atom separation as the sphere diameter rather than returning a fixed ideal value.</dd>
+          <dt>Nearest-neighbour distance and touching radius</dt>
+          <dd><span data-tex='d_{\mathrm{nn}}'>dnn</span> is the shortest separation between lattice sites in the periodic crystal. The educational hard-sphere radius is <span data-tex='r=d_{\mathrm{nn}}/2'>r = dnn/2</span>; it is not a measured elemental atomic radius.</dd>
+          <dt>Cell volume</dt>
+          <dd>Calculated from the determinant of the three lattice vectors. The displayed HCP prism has three times the volume of its two-atom primitive computational cell.</dd>
+          <dt>Theoretical density</dt>
+          <dd>Shown for real-material presets with an atomic molar mass. It is calculated from <span data-tex='\rho=\frac{nM}{N_{\mathrm A}V}'>ρ = nM/(NₐV)</span>, where <span data-tex='1\,\text{\AA}^3=10^{-24}\,\mathrm{cm}^3'>1 Å³ = 10⁻²⁴ cm³</span>. Density is in g/cm³; lengths and Cartesian coordinates are in Å, and volume is in Å³.</dd>
+        </dl>
+        <p>For HCP density, the code uses two atoms and the primitive-cell volume. Using six effective atoms and the three-times-larger educational prism volume gives the same result.</p>
+      </section>
+
+      <section class="content-section" id="coordinates">
+        <h2>Coordinate System</h2>
+        <p>A lattice coordinate <span data-tex='(u,v,w)'>(u, v, w)</span> gives coefficients of the three lattice vectors, not distances along three screen directions. With vectors <span data-tex='\mathbf a_1,\mathbf a_2,\mathbf a_3'>a₁, a₂, a₃</span>, the Cartesian position is <span data-tex='\mathbf r=u\mathbf a_1+v\mathbf a_2+w\mathbf a_3'>r = u a₁ + v a₂ + w a₃</span>. Python stores the vectors as rows and performs this same conversion for all four structures.</p>
+        <p>The inspector shows the original scientific coordinate frame. Centering the model in the viewport and rotating the camera do not alter these reported coordinates. Fractional coefficients of visible finite-boundary sites can reach or exceed 1; the centered HCP prism also has some negative basal coefficients. This is expected for a display extending beyond one half-open primitive cell.</p>
+      </section>
+
+      <section class="content-section" id="materials">
+        <h2>Real Material Presets</h2>
+        <p>The local preset catalog supplies cited lattice parameters and atomic molar masses. Selecting a preset sets its parameters and enables a theoretical-density calculation; it does not turn the ideal lattice picture into a full materials simulation.</p>
+        <div class="table-scroll">
+          <table>
+            <caption>Current elemental presets and source conditions</caption>
+            <thead><tr><th scope="col">Preset</th><th scope="col">Structure</th><th scope="col">Lattice parameters</th><th scope="col">Lattice source</th></tr></thead>
+            <tbody>
+              <tr><th scope="row">α-Polonium</th><td>SC</td><td><span data-tex='a=3.359\,\text{\AA}'>a = 3.359 Å</span>; accessible abstract does not specify a measurement temperature</td><td><a href="https://www.sciencedirect.com/science/article/pii/0022190266802701" target="_blank" rel="noopener noreferrer">DeSando and Lange (1966)</a></td></tr>
+              <tr><th scope="row">α-Iron (ferrite)</th><td>BCC</td><td><span data-tex='a=2.8665\,\text{\AA}'>a = 2.8665 Å</span> at 25 °C</td><td><a href="https://unit.aist.go.jp/mmri/ja/organization/db-nomura/common/struc-coord/Fe-c.html" target="_blank" rel="noopener noreferrer">AIST crystal data</a></td></tr>
+              <tr><th scope="row">Copper</th><td>FCC</td><td><span data-tex='a=3.6148\,\text{\AA}'>a = 3.6148 Å</span> at 18 °C</td><td><a href="https://unit.aist.go.jp/mmri/ja/organization/db-nomura/common/struc-coord/Cu-c.html" target="_blank" rel="noopener noreferrer">AIST crystal data</a></td></tr>
+              <tr><th scope="row">Magnesium</th><td>HCP</td><td><span data-tex='a=3.2094\,\text{\AA},\quad c=5.2105\,\text{\AA}'>a = 3.2094 Å, c = 5.2105 Å</span> at 25 °C</td><td><a href="https://unit.aist.go.jp/mmri/ja/organization/db-nomura/common/struc-coord/Mg-c.html" target="_blank" rel="noopener noreferrer">AIST crystal data</a></td></tr>
+            </tbody>
+          </table>
+        </div>
+        <p>Magnesium's stored <span data-tex='c/a\approx1.6235'>c/a ≈ 1.6235</span> is derived from its cited <span data-tex='c'>c</span> and <span data-tex='a'>a</span>; it is not the ideal ratio. Polonium has no standard atomic weight, so the catalog uses a Po-209 isotope mass only as a representative input to model density—not as a measured density for the cited Po-208/Po-209 sample.</p>
+      </section>
+
+      <section class="content-section" id="hcp">
+        <h2>HCP Convention</h2>
+        <p>The scientific HCP lattice uses 120° basal vectors and a <strong>two-atom primitive basis</strong>. Its primitive-cell volume is <span data-tex='V_{\mathrm{primitive}}=\frac{\sqrt3}{2}a^2c'>Vprimitive = √3 a²c / 2</span>. The familiar educational hexagonal prism encloses three such primitive volumes: <span data-tex='V_{\mathrm{prism}}=3V_{\mathrm{primitive}}'>Vprism = 3 Vprimitive</span>.</p>
+        <p>One prism has <strong>17 visible sites</strong>: seven on the bottom A layer (six corners and one basal center), three interior B-layer sites, and seven on the top A layer. Shared-boundary accounting gives <span data-tex='12(1/6)+2(1/2)+3=6'>12 × ⅙ + 2 × ½ + 3 = 6</span> effective atoms per educational prism. These are different counts: two primitive basis atoms, six effective atoms by prism accounting, and seventeen visible spheres for a single finite prism.</p>
+        <p>For larger displays, Python tiles whole prisms in the basal plane using <span data-tex='\mathbf T_1=2\mathbf a_1+\mathbf a_2'>T₁ = 2a₁ + a₂</span> and <span data-tex='\mathbf T_2=\mathbf a_1+2\mathbf a_2'>T₂ = a₁ + 2a₂</span>. These display translations span three primitive basal cells per prism; they are <strong>not</strong> new crystallographic axes. Sites and shared cell lines are deduplicated, while the outer boundary traces only the exterior of the whole cluster. A <strong>3 × 3 prism cluster</strong> has nine one-prism-high educational cells, representing 27 primitive cells by volume, not a 3 × 3 × 3 primitive scientific supercell. The API's separate <code>size</code> parameter still controls that periodic scientific supercell; <code>display_size</code> controls only the HCP drawing.</p>
+        <p>The bottom A layer is at <span data-tex='z=0'>z = 0</span>, the offset B layer at <span data-tex='z=c/2'>z = c/2</span>, and the aligned top A layer at <span data-tex='z=c'>z = c</span>. Repeating upward gives ABAB…; the top A layer is the next A layer, not a new species. Ideal close packing has <span data-tex='(c/a)_{\mathrm{ideal}}=\sqrt{8/3}\approx1.633'>(c/a)ideal = √(8/3) ≈ 1.633</span>.</p>
+      </section>
+
+      <section class="content-section" id="viewer-controls">
+        <h2>Viewer Controls</h2>
+        <dl class="docs-definitions">
+          <dt>Reset View</dt><dd>Refits the current model after orbiting, zooming, or panning.</dd>
+          <dt>Axes</dt><dd>Shows or hides labeled lattice directions <span data-tex='\mathbf a_1,\mathbf a_2,\mathbf a_3'>a₁, a₂, a₃</span>. HCP's two basal directions are 120° apart.</dd>
+          <dt>Cell Lines — Outer</dt><dd>In Crystal view, shows only the exterior cubic-supercell boundary or the exterior boundary of the entire HCP prism cluster. This is the default view.</dd>
+          <dt>Cell Lines — All Cells</dt><dd>In Crystal view, outlines every conventional cubic cell in an SC, BCC, or FCC block, or every educational hexagonal prism in an HCP cluster. Shared edges appear only once.</dd>
+          <dt>Cell Lines — Off</dt><dd>In Crystal view, hides structural boundary and grid lines; crystallographic axes remain independent. Unit Cell always shows its one-cell outline, while Coordination and Stacking do not show cell lines.</dd>
+          <dt>Contact Diagonals</dt><dd>For BCC, four full body diagonals in each cubic cell pass through its body centre, illustrating <span data-tex='\sqrt{3}a=4r'>√3 a = 4r</span>. For FCC, both diagonals of every square face meet at its face centre, illustrating <span data-tex='\sqrt{2}a=4r'>√2 a = 4r</span>. These thin geometric guides are <strong>not chemical bonds</strong>. The control is available in Crystal or Unit Cell for BCC/FCC, not for SC/HCP or the other views.</dd>
+          <dt>Neighbour Lines</dt><dd>In Coordination view, shows or hides the centre-to-neighbour guides. On by default; they are not chemical bond predictions.</dd>
+          <dt>Polyhedron</dt><dd>In Coordination view, shows or hides the translucent shape joining the neighbour centres. Off by default.</dd>
+          <dt>Auto-Rotate</dt><dd>Turns on a slow camera orbit. It is disabled when your operating system requests reduced motion.</dd>
+        </dl>
+        <p>Axes, Contact Diagonals, and Auto-Rotate start off; Cell Lines starts at Outer. These visual preferences do not trigger a scientific recalculation. The HCP axes still show the primitive 120° lattice vectors, not the wider prism-tiling translations.</p>
+        <h3>Advanced Display Controls</h3>
+        <dl class="docs-definitions">
+          <dt>Atom Size</dt><dd>Scales the displayed spheres in Crystal, Coordination, and Stacking views only. It does not change the physical touching radius, nearest-neighbour distance, atomic packing factor, density, or coordinates. Unit Cell has no Atom Size control because its spheres always use the physical touching radius.</dd>
+          <dt>Color — Material / Site Role</dt><dd>In Crystal and Unit Cell views, Material preserves the existing uniform atom color for a preset or Custom structure. Site Role colors positions such as corner, body centre, face or basal centre, and HCP interior using role metadata from Python. These colors describe geometry, not different chemical species; the viewer legend names each role and shows Unit Cell sharing fractions.</dd>
+          <dt>Neighbour Network</dt><dd>In Crystal view, optional lines show repeating first-coordination-shell connectivity among visible sites. Lines connect sites belonging to the structure's standard first coordination shell. They are geometric guides, <strong>not chemical bond predictions</strong>. Unlike Coordination's Neighbour Lines, this network spans the finite crystal.</dd>
+          <dt>Clip at Cell Walls</dt><dd>In Unit Cell view, on shows only the portion of each physical hard sphere inside the conventional cell, with filled cut faces. Off shows the full shared spheres extending outside the cell. Both settings keep the same centres and touching radius; site selection remains disabled.</dd>
+          <dt>Layer Separation</dt><dd>In Stacking view, 100% is natural crystallographic spacing. Larger values visually spread the planes apart without changing scientific coordinates or properties.</dd>
+        </dl>
+        <h3>Fullscreen</h3>
+        <p>Fullscreen expands only the interactive 3D stage, hiding the surrounding panels so the crystal has maximum screen space. Press <kbd>Escape</kbd> or use the fullscreen button to return. Your viewer settings and selected site are preserved.</p>
+      </section>
+
+      <section class="content-section" id="relations">
+        <h2>Mathematical Relations</h2>
+        <p>These are reference relations for the ideal hard-sphere structures. The live numbers in the Explorer come from the Python model, not from equations recalculated by this page.</p>
+        <div class="table-scroll">
+          <table>
+            <caption>Nearest-neighbour and touching-radius relations</caption>
+            <thead><tr><th scope="col">Structure</th><th scope="col">Nearest-neighbour distance</th><th scope="col">Touching radius</th></tr></thead>
+            <tbody>
+              <tr><th scope="row">SC</th><td><span data-tex='d_{\mathrm{nn}}=a'>dnn = a</span></td><td><span data-tex='r=a/2'>r = a/2</span></td></tr>
+              <tr><th scope="row">BCC</th><td><span data-tex='d_{\mathrm{nn}}=\sqrt3a/2'>dnn = √3a/2</span></td><td><span data-tex='r=\sqrt3a/4'>r = √3a/4</span></td></tr>
+              <tr><th scope="row">FCC</th><td><span data-tex='d_{\mathrm{nn}}=a/\sqrt2'>dnn = a/√2</span></td><td><span data-tex='r=a/(2\sqrt2)'>r = a/(2√2)</span></td></tr>
+              <tr><th scope="row">Ideal HCP</th><td><span data-tex='d_{\mathrm{nn}}=a'>dnn = a</span></td><td><span data-tex='r=a/2'>r = a/2</span></td></tr>
+            </tbody>
+          </table>
+        </div>
+        <p>For cubic cells, <span data-tex='V=a^3'>V = a³</span>. For the HCP primitive cell, <span data-tex='V=\frac{\sqrt3}{2}a^2c'>V = √3 a²c / 2</span>. The packing values are approximately 0.5236 (SC), 0.6802 (BCC), and 0.7405 (FCC and ideal HCP). At non-ideal HCP <span data-tex='c/a'>c/a</span>, the model finds the actual shortest periodic distance and uses it for <span data-tex='r=d_{\mathrm{nn}}/2'>r = dnn/2</span> and APF.</p>
+      </section>
+
+      <section class="content-section" id="data-sources">
+        <h2>Data Sources</h2>
+        <p>Preset values and provenance are stored locally in <code>data/materials.json</code>. The app does not query a remote materials service while it runs. The catalog records these sources:</p>
+        <ul>
+          <li>α-Po lattice and phase: <a href="https://www.sciencedirect.com/science/article/pii/0022190266802701" target="_blank" rel="noopener noreferrer">DeSando and Lange (1966)</a> and <a href="https://aflow.org/p/A_cP1_221_a-001/" target="_blank" rel="noopener noreferrer">AFLOW's α-Po prototype</a>.</li>
+          <li>Fe, Cu, and Mg lattice constants: AIST Crystal Structure Gallery entries for <a href="https://unit.aist.go.jp/mmri/ja/organization/db-nomura/common/struc-coord/Fe-c.html" target="_blank" rel="noopener noreferrer">Fe</a>, <a href="https://unit.aist.go.jp/mmri/ja/organization/db-nomura/common/struc-coord/Cu-c.html" target="_blank" rel="noopener noreferrer">Cu</a>, and <a href="https://unit.aist.go.jp/mmri/ja/organization/db-nomura/common/struc-coord/Mg-c.html" target="_blank" rel="noopener noreferrer">Mg</a>.</li>
+          <li>Fe, Cu, and Mg molar masses: <a href="https://www.ciaaw.org/abridged-atomic-weights.htm" target="_blank" rel="noopener noreferrer">CIAAW abridged standard atomic weights</a>. For Po, <a href="https://www.ciaaw.org/atomic-weights.htm" target="_blank" rel="noopener noreferrer">CIAAW lists no standard atomic weight</a>; the representative Po-209 isotope mass comes from <a href="https://physics.nist.gov/cgi-bin/Compositions/stand_alone.pl?ascii=ascii&amp;ele=Po" target="_blank" rel="noopener noreferrer">NIST isotope data</a>.</li>
+        </ul>
+        <p>The locally included rendering libraries are <a href="https://github.com/mrdoob/three.js/tree/r186" target="_blank" rel="noopener noreferrer">Three.js r186</a> and <a href="https://github.com/KaTeX/KaTeX/releases/tag/v0.18.7" target="_blank" rel="noopener noreferrer">KaTeX v0.18.7</a>; their licenses are included beside the vendored files. External links are references only—the simulator's normal operation is local.</p>
+      </section>
+
+      <section class="content-section" id="architecture">
+        <h2>Software Architecture</h2>
+        <p>The browser sends chosen parameters and view mode to Flask's JSON API. Flask validates the request and asks the Python/NumPy model for lattice vectors, positions, mode-specific geometry, and properties. It also reads the curated local JSON preset catalog. The browser's vanilla JavaScript updates controls and inspectors; Three.js renders the returned positions and boundaries, while KaTeX typesets the explanatory equations.</p>
+        <p>In short: <strong>browser controls → Flask API → Python/NumPy model → JSON response → Three.js display</strong>. Scientific calculations live in Python; the renderer does not independently decide where SC, BCC, FCC, or HCP lattice sites belong. This Documentation page does not start a WebGL viewer.</p>
+      </section>
+
+      <section class="content-section" id="limitations">
+        <h2>Assumptions and Limitations</h2>
+        <p>The model covers only monatomic SC, BCC, FCC, and HCP lattices. It does not import CIF files or model NaCl, diamond-type structures, or defects. It also does not simulate diffraction, reciprocal lattices, electronic structure, or molecular dynamics. Crystal-view sphere size is chosen for visual clarity; Unit Cell shows the model's touching radius. Neither is an experimentally measured atomic surface.</p>
+        <p>Material lattice constants are representative values measured under the conditions given in the catalog and can vary with temperature, pressure, and sample. The standard HCP coordination number and close-packed APF refer to ideal geometry; for non-ideal <span data-tex='c/a'>c/a</span>, the model computes shortest-neighbour distance and touching-sphere APF from current geometry. HCP clusters tile only the basal plane and remain one prism high; they do not model arbitrary three-dimensional prism stacks.</p>
+      </section>
+
+      <section class="content-section" id="troubleshooting">
+        <h2>Troubleshooting</h2>
+        <dl class="docs-definitions">
+          <dt>The 3D view does not appear</dt><dd>Use a current browser with WebGL enabled. Check the message in the viewer and your browser's developer console.</dd>
+          <dt>Port 5000 is already in use</dt><dd>Stop the other local process using that port, then start the Flask app again. The usual launch command from the project root is <code>.venv/bin/python app.py</code>.</dd>
+          <dt>Edits do not appear</dt><dd>Reload the page; if necessary, use a hard refresh to clear stale locally cached CSS or JavaScript.</dd>
+        </dl>
+      </section>
+    </article>
+  </div>
+</main>
+{% endblock %}
+
+{% block scripts %}
+    <script defer src="{{ url_for('static', filename='vendor/katex/katex.min.js') }}"></script>
+    <script defer src="{{ url_for('static', filename='js/math.js') }}"></script>
+{% endblock %}

@@ -1,0 +1,10 @@
+services:
+  - type: web
+    name: crystal-structure-explorer
+    runtime: python
+    plan: free
+    branch: main
+    buildCommand: pip install -r requirements.txt
+    startCommand: gunicorn app:app
+    healthCheckPath: /health
+    autoDeployTrigger: commit

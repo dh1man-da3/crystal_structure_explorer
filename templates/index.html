@@ -1,0 +1,245 @@
+{% extends "base.html" %}
+{% block title %}Crystal Structure Explorer{% endblock %}
+{% block description %}Explore SC, BCC, FCC and HCP crystals in an interactive solid-state physics simulator.{% endblock %}
+{% block head_assets %}
+    <link rel="stylesheet" href="{{ url_for('static', filename='vendor/katex/katex.min.css') }}">
+    <script type="importmap">
+      {
+        "imports": {
+          "three": "{{ url_for('static', filename='vendor/three/three.module.js') }}",
+          "three/addons/": "{{ url_for('static', filename='vendor/three/') }}"
+        }
+      }
+    </script>
+{% endblock %}
+{% block content %}
+      <main id="main-content" class="workspace">
+        <aside id="controls" class="sidebar controls" aria-label="Crystal controls" data-ideal-hcp-ratio="{{ ideal_hcp_ratio }}" aria-busy="true" inert>
+          <div class="sidebar-heading">
+            <span class="eyebrow">Model controls</span>
+            <h2>Configure lattice</h2>
+          </div>
+
+          <fieldset id="view-mode-group" class="control-section view-mode-group" aria-describedby="view-mode-help">
+            <legend>View</legend>
+            <div class="segmented-control view-mode-control">
+              <input id="view-crystal" type="radio" name="view-mode" value="crystal" checked>
+              <label for="view-crystal">Crystal</label>
+              <input id="view-unit" type="radio" name="view-mode" value="unit">
+              <label for="view-unit">Unit Cell</label>
+              <input id="view-coordination" type="radio" name="view-mode" value="coordination">
+              <label for="view-coordination">Coordination</label>
+              <input id="view-stacking" type="radio" name="view-mode" value="stacking">
+              <label for="view-stacking">Stacking</label>
+            </div>
+            <p id="view-mode-help" class="control-help">Explore a finite crystal and its repeating unit cells.</p>
+          </fieldset>
+
+          <section class="control-section" aria-labelledby="structure-controls-heading">
+            <h3 id="structure-controls-heading">Structure</h3>
+            <div class="control-group">
+              <label for="structure">Crystal type</label>
+              <select id="structure" name="structure">
+                <option value="sc">SC — Simple Cubic</option>
+                <option value="bcc">BCC — Body-Centered Cubic</option>
+                <option value="fcc">FCC — Face-Centered Cubic</option>
+                <option value="hcp">HCP — Hexagonal Close-Packed</option>
+              </select>
+            </div>
+            <div class="control-group">
+              <label for="material">Material</label>
+              <select id="material" name="material">
+                <option value="">Custom / Generic</option>
+              </select>
+              <p id="material-error" class="input-error" hidden>Material presets could not be loaded.</p>
+            </div>
+          </section>
+
+          <section class="control-section" aria-labelledby="lattice-controls-heading">
+            <h3 id="lattice-controls-heading">Lattice</h3>
+            <div class="control-group">
+              <div class="control-label-row">
+                <label for="a-slider">Lattice constant <i>a</i></label>
+                <div class="numeric-row">
+                  <label class="visually-hidden" for="a-number">Lattice constant a, numeric value</label>
+                  <input id="a-number" type="number" min="2" max="6" step="any" value="3.00" aria-describedby="a-error" inputmode="decimal">
+                  <span class="unit">Å</span>
+                </div>
+              </div>
+              <input id="a-slider" type="range" min="2" max="6" step="any" value="3">
+              <p id="a-error" class="input-error" hidden>Enter a value from 2.00 to 6.00 Å.</p>
+            </div>
+
+            <div id="hcp-ratio-group" class="control-group" hidden>
+              <div class="control-label-row">
+                <label for="ratio-slider"><i>c</i>/<i>a</i> ratio</label>
+                <div class="numeric-row">
+                  <label class="visually-hidden" for="ratio-number">c/a ratio, numeric value</label>
+                  <input id="ratio-number" type="number" min="1.2" max="2" step="any" value="1.633" aria-describedby="ratio-error" inputmode="decimal">
+                </div>
+              </div>
+              <input id="ratio-slider" type="range" min="1.2" max="2" step="any" value="{{ ideal_hcp_ratio }}">
+              <p id="ratio-error" class="input-error" hidden>Enter a value from 1.200 to 2.000.</p>
+            </div>
+          </section>
+
+          <details id="advanced-controls" class="advanced-controls" open>
+            <summary>Appearance &amp; display</summary>
+          <section class="control-section" aria-labelledby="appearance-controls-heading">
+            <h3 id="appearance-controls-heading">Appearance</h3>
+            <div id="atom-size-group" class="control-group">
+              <div class="control-label-row">
+                <label for="atom-size-slider">Atom Size</label>
+                <output id="atom-size-value" for="atom-size-slider">100%</output>
+              </div>
+              <input id="atom-size-slider" type="range" min="30" max="120" step="5" value="100" aria-describedby="atom-size-note">
+              <p id="atom-size-note" class="control-help">Visual scale only; scientific distances and radii do not change.</p>
+            </div>
+            <fieldset id="color-scheme-group" class="control-group compact-fieldset">
+              <legend>Color</legend>
+              <div class="segmented-control two-options">
+                <input id="color-material" type="radio" name="color-scheme" value="material" checked>
+                <label for="color-material">Material</label>
+                <input id="color-role" type="radio" name="color-scheme" value="role">
+                <label for="color-role">Site Role</label>
+              </div>
+            </fieldset>
+          </section>
+
+          <section class="control-section" aria-labelledby="display-controls-heading">
+            <h3 id="display-controls-heading">Display</h3>
+            <div id="cubic-size-group" class="control-group">
+              <label for="cubic-size">Cubic supercell</label>
+              <select id="cubic-size" name="cubic-size">
+                <option value="1">1 × 1 × 1</option>
+                <option value="2">2 × 2 × 2</option>
+                <option value="3" selected>3 × 3 × 3</option>
+                <option value="4">4 × 4 × 4</option>
+              </select>
+            </div>
+            <div id="hcp-cluster-group" class="control-group" hidden>
+              <label for="hcp-display-size">Prism Cluster</label>
+              <select id="hcp-display-size" name="hcp-display-size" aria-describedby="hcp-cluster-note">
+                <option value="1">1 × 1 prisms</option>
+                <option value="2" selected>2 × 2 prisms</option>
+                <option value="3">3 × 3 prisms</option>
+                <option value="4">4 × 4 prisms</option>
+              </select>
+              <p id="hcp-cluster-note" class="control-help">Basal prism cluster · one prism high</p>
+            </div>
+            <fieldset id="cell-lines-group" class="control-group cell-lines-group">
+              <legend>Cell Lines</legend>
+              <div class="segmented-control">
+                <input id="cell-lines-outer" type="radio" name="cell-lines" value="outer" checked>
+                <label for="cell-lines-outer">Outer</label>
+                <input id="cell-lines-all" type="radio" name="cell-lines" value="all">
+                <label for="cell-lines-all">All Cells</label>
+                <input id="cell-lines-off" type="radio" name="cell-lines" value="off">
+                <label for="cell-lines-off">Off</label>
+              </div>
+            </fieldset>
+            <div id="contact-diagonals-group" class="control-group">
+              <div class="toggle-row">
+                <input id="contact-diagonals" type="checkbox" aria-describedby="contact-diagonals-note">
+                <label for="contact-diagonals">Contact Diagonals</label>
+              </div>
+              <p id="contact-diagonals-note" class="control-help">Geometric contact guides for BCC and FCC, not chemical bonds.</p>
+            </div>
+            <div id="neighbour-network-group" class="control-group">
+              <div class="toggle-row">
+                <input id="neighbour-network" type="checkbox" aria-describedby="neighbour-network-note">
+                <label for="neighbour-network">Neighbour Network</label>
+              </div>
+              <p id="neighbour-network-note" class="control-help">Geometric nearest-neighbour guides, not chemical bonds.</p>
+            </div>
+            <div id="unit-clip-group" class="control-group" hidden>
+              <div class="toggle-row">
+                <input id="unit-clip" type="checkbox" checked aria-describedby="unit-clip-note">
+                <label for="unit-clip">Clip at Cell Walls</label>
+              </div>
+              <p id="unit-clip-note" class="control-help">Turn off to view full physical hard spheres across the boundary.</p>
+            </div>
+            <div id="coordination-controls-group" class="control-group" hidden>
+              <div class="toggle-row">
+                <input id="neighbour-lines" type="checkbox" checked aria-describedby="coordination-guides-note">
+                <label for="neighbour-lines">Neighbour Lines</label>
+              </div>
+              <div class="toggle-row">
+                <input id="coordination-polyhedron" type="checkbox" aria-describedby="coordination-guides-note">
+                <label for="coordination-polyhedron">Polyhedron</label>
+              </div>
+              <p id="coordination-guides-note" class="control-help">Geometric guides, not chemical bond predictions.</p>
+            </div>
+            <div id="layer-separation-group" class="control-group" hidden>
+              <div class="control-label-row">
+                <label for="layer-separation-slider">Layer Separation</label>
+                <div class="numeric-row">
+                  <label class="visually-hidden" for="layer-separation-number">Layer Separation, percentage</label>
+                  <input id="layer-separation-number" type="number" min="100" max="250" step="1" value="160" aria-describedby="layer-separation-note" inputmode="numeric">
+                  <span class="unit">%</span>
+                </div>
+              </div>
+              <input id="layer-separation-slider" type="range" min="100" max="250" step="1" value="160">
+              <p id="layer-separation-note" class="control-help">100% is natural layer spacing; larger values separate layers visually.</p>
+            </div>
+          </section>
+          </details>
+        </aside>
+
+        <section class="viewer-panel" aria-label="Crystal viewer">
+          <div id="viewer-stage" class="viewer-stage">
+            <div id="viewer" aria-label="Interactive three-dimensional crystal structure"></div>
+            <div id="viewer-loader" class="viewer-loader" role="status" aria-live="polite">
+              <span class="viewer-loader-spinner" aria-hidden="true"></span>
+              <span>Preparing 3D viewer…</span>
+            </div>
+            <div class="viewer-tools" role="toolbar" aria-label="Viewer controls">
+              <button id="reset-view" type="button" title="Return to the default camera view" disabled>Reset View</button>
+              <button id="toggle-axes" type="button" aria-pressed="false" title="Show crystallographic lattice vectors">Axes</button>
+              <button id="toggle-auto-rotate" type="button" aria-pressed="false" title="Slowly rotate the view">Auto-Rotate</button>
+              <span id="reduced-motion-note" class="visually-hidden">Auto-Rotate is unavailable while Reduce Motion is enabled.</span>
+            </div>
+            <div class="viewer-hud">
+              <span class="eyebrow">Structure view</span>
+              <strong id="hud-structure">SC</strong>
+              <p id="status" role="status" aria-live="polite" data-state="loading">Loading SC structure…</p>
+              <p id="toolbar-summary" class="viewer-model-summary" aria-live="polite">Loading model…</p>
+            </div>
+            <div id="mode-legend" class="mode-legend" hidden aria-live="polite"></div>
+            <p class="viewer-hint"><span class="pointer-hint">Drag to rotate · Scroll to zoom · Right-drag to pan</span><span class="touch-hint">One finger to rotate · Pinch to zoom · Two fingers to pan</span></p>
+            <p id="fullscreen-error" class="fullscreen-error" role="status" hidden></p>
+            <button id="toggle-fullscreen" class="fullscreen-button" type="button" aria-label="Enter fullscreen" title="Enter fullscreen" disabled>
+              <svg class="fullscreen-icon fullscreen-icon-enter" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+                <path d="M9 4H4v5M15 4h5v5M4 15v5h5M20 15v5h-5" />
+              </svg>
+              <svg class="fullscreen-icon fullscreen-icon-exit" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+                <path d="M4 9h5V4M20 9h-5V4M4 15h5v5M20 15h-5v5" />
+              </svg>
+            </button>
+          </div>
+        </section>
+
+        <aside id="properties" class="sidebar property-panel" aria-label="Scientific properties" aria-busy="true">
+          <div class="sidebar-heading">
+            <span class="eyebrow">Scientific inspector</span>
+            <h2>Properties</h2>
+          </div>
+          <div id="property-content">
+            <p class="property-note">Loading calculated properties…</p>
+            <section id="selected-site" class="selected-site-panel property-section" aria-labelledby="selected-site-heading">
+              <div class="selected-site-header">
+                <h3 id="selected-site-heading">Selected Site</h3>
+                <button id="clear-selection" type="button" hidden>Clear selection</button>
+              </div>
+              <div id="selected-site-content" aria-live="polite">
+                <p class="property-note">Click a lattice site in the 3D model to inspect its coordinates.</p>
+              </div>
+            </section>
+          </div>
+        </aside>
+      </main>
+{% endblock %}
+{% block scripts %}
+    <script src="{{ url_for('static', filename='vendor/katex/katex.min.js') }}"></script>
+    <script type="module" src="{{ url_for('static', filename='js/app.js') }}"></script>
+{% endblock %}

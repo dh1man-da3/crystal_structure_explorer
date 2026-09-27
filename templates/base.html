@@ -1,0 +1,50 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+    <meta name="description" content="{% block description %}Explore fundamental crystal structures in a local interactive physics application.{% endblock %}">
+    <title>{% block title %}Crystal Structure Explorer{% endblock %}</title>
+    {% block head_assets %}{% endblock %}
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+  </head>
+  <body{% if active_page == 'home' %} class="app-booting"{% endif %}>
+    <div class="app-shell">
+      <header class="site-header">
+        <a class="site-brand" href="{{ url_for('index') }}" aria-label="Crystal Structure Explorer — Explorer"{% if active_page == 'home' %} aria-current="page"{% endif %}>
+          <svg class="brand-mark" viewBox="0 0 32 32" fill="none" aria-hidden="true">
+            <path d="M16 3.5 27 9.75v12.5L16 28.5 5 22.25V9.75L16 3.5Z" />
+            <path d="M5.5 10 16 16l10.5-6M16 16v12" />
+            <circle cx="16" cy="16" r="2" />
+          </svg>
+          <span class="site-brand-text">
+            <span class="site-brand-title">Crystal Structure Explorer</span>
+            <span class="site-brand-subtitle">Solid State Physics</span>
+          </span>
+        </a>
+        <button class="site-nav-toggle" type="button" aria-label="Open navigation" aria-expanded="false" aria-controls="site-navigation" hidden>
+          <svg viewBox="0 0 24 24" fill="none" aria-hidden="true">
+            <path d="M4 6h16M4 12h16M4 18h16" />
+          </svg>
+        </button>
+        <nav id="site-navigation" class="site-nav" aria-label="Primary navigation">
+          <a class="site-nav-explorer{% if active_page == 'home' %} is-active{% endif %}" href="{{ url_for('index') }}"{% if active_page == 'home' %} aria-current="page"{% endif %}>Explorer</a>
+          <a href="{{ url_for('compare') }}"{% if active_page == 'compare' %} class="is-active" aria-current="page"{% endif %}>Compare</a>
+          <a href="{{ url_for('docs') }}"{% if active_page == 'docs' %} class="is-active" aria-current="page"{% endif %}>Documentation</a>
+          <a href="{{ url_for('about') }}"{% if active_page == 'about' %} class="is-active" aria-current="page"{% endif %}>About</a>
+        </nav>
+      </header>
+
+      {% block content %}{% endblock %}
+
+      {% if active_page != 'home' %}
+      <footer class="site-footer">
+        <span>Crystal Structure Explorer · Educational Solid State Physics Project</span>
+        <span>Chandigarh University</span>
+      </footer>
+      {% endif %}
+    </div>
+    <script defer src="{{ url_for('static', filename='js/navigation.js') }}"></script>
+    {% block scripts %}{% endblock %}
+  </body>
+</html>

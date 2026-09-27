@@ -1,0 +1,21 @@
+# Python
+__pycache__/
+*.py[cod]
+.pytest_cache/
+.coverage
+.coverage.*
+htmlcov/
+
+# Virtual environments
+.venv/
+venv/
+
+# macOS and editor files
+.DS_Store
+.vscode/
+.idea/
+
+# Local environment files (an example file may be tracked deliberately)
+.env
+.env.*
+!.env.example

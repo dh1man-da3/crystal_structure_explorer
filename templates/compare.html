@@ -1,0 +1,114 @@
+{% extends "base.html" %}
+
+{% block title %}Compare Structures — Crystal Structure Explorer{% endblock %}
+{% block description %}Compare the geometry and fundamental properties of SC, BCC, FCC and HCP crystals.{% endblock %}
+
+{% block head_assets %}
+<link rel="stylesheet" href="{{ url_for('static', filename='vendor/katex/katex.min.css') }}">
+<script type="importmap">
+  {
+    "imports": {
+      "three": "{{ url_for('static', filename='vendor/three/three.module.js') }}",
+      "three/addons/": "{{ url_for('static', filename='vendor/three/') }}"
+    }
+  }
+</script>
+{% endblock %}
+
+{% block content %}
+<main id="main-content" class="page-shell content-page compare-page">
+  <header class="page-header">
+    <p class="eyebrow">Side by side</p>
+    <h1>Compare Crystal Structures</h1>
+    <p>Explore SC, BCC, FCC and HCP side by side, then compare their geometry and key solid-state properties.</p>
+  </header>
+
+  <section class="compare-models" aria-labelledby="models-heading">
+    <h2 id="models-heading" class="visually-hidden">Interactive structure models</h2>
+    <div class="compare-model-grid">
+      {% for item in comparison.structures %}
+      <article class="compare-model-card" aria-labelledby="model-heading-{{ item.code|lower }}">
+        <header class="compare-card-header">
+          <span class="comparison-code">{{ item.code }}</span>
+          <h3 id="model-heading-{{ item.code|lower }}">{{ item.full_name }}</h3>
+        </header>
+        <div class="compare-stage" data-structure="{{ item.code }}"
+             data-model-url="{{ url_for('api_structure') }}?structure={{ item.code|lower }}&amp;a=3&amp;size=1&amp;view=crystal{% if item.code == 'HCP' %}&amp;display_size=1{% endif %}"
+             role="group" aria-label="Interactive 3D model of {{ item.full_name }} crystal structure" aria-describedby="compare-interaction-hint">
+          <p class="compare-model-message" role="status">Loading model…</p>
+        </div>
+        <dl class="compare-quick-facts">
+          <div><dt>Effective atoms/{% if item.code == 'HCP' %}prism{% else %}cell{% endif %}</dt><dd>{{ item.display_cell_atom_count }}</dd></div>
+          <div><dt>Coordination number</dt><dd>{{ item.coordination_number }}</dd></div>
+          <div><dt>APF{% if item.code == 'HCP' %} · ideal{% endif %}</dt><dd>{{ '%.1f'|format(item.packing_factor * 100) }}%</dd></div>
+        </dl>
+      </article>
+      {% endfor %}
+    </div>
+    <p id="compare-interaction-hint" class="compare-interaction-hint"><span class="pointer-hint">Drag a model to rotate · scroll or pinch to zoom</span><span class="touch-hint">Drag a model to rotate · pinch to zoom</span></p>
+  </section>
+
+  <section class="content-section" aria-labelledby="comparison-heading">
+    <div class="section-heading">
+      <h2 id="comparison-heading">Scientific Comparison</h2>
+      <p>Ideal structural relations above; cited elemental examples below.</p>
+    </div>
+    <div class="comparison-scroll" role="region" aria-label="Crystal structure comparison table" tabindex="0">
+      <table class="comparison-table">
+        <caption>Generic models use a = 3.0 Å and ideal HCP c/a. Example lattice parameters and densities belong to the named material, not to the structure universally.</caption>
+        <thead>
+          <tr>
+            <th scope="col">Property</th>
+            {% for item in comparison.structures %}
+            <th scope="col"><span class="comparison-code">{{ item.code }}</span></th>
+            {% endfor %}
+          </tr>
+        </thead>
+        <tbody>
+          <tr class="comparison-group"><th colspan="5" scope="colgroup">Cell &amp; Geometry</th></tr>
+          <tr><th scope="row">Full name</th>{% for item in comparison.structures %}<td>{{ item.full_name }}</td>{% endfor %}</tr>
+          <tr><th scope="row">Crystal system</th>{% for item in comparison.structures %}<td>{{ item.crystal_system }}</td>{% endfor %}</tr>
+          <tr><th scope="row">Conventional / educational cell</th>{% for item in comparison.structures %}<td>{{ item.cell_description }}</td>{% endfor %}</tr>
+          <tr><th scope="row">Computational basis atoms</th>{% for item in comparison.structures %}<td>{{ item.basis_atom_count }} <small class="comparison-detail">{% if item.code == 'HCP' %}Primitive cell{% else %}Conventional cell{% endif %}</small></td>{% endfor %}</tr>
+          <tr><th scope="row">Effective atoms per cell / prism</th>{% for item in comparison.structures %}<td>{{ item.display_cell_atom_count }}{% if item.code == 'HCP' %} <small class="comparison-detail">Per educational prism</small>{% endif %}</td>{% endfor %}</tr>
+          <tr><th scope="row">Visible sites in displayed unit</th>{% for item in comparison.structures %}<td>{{ item.single_cell_visible_site_count }}</td>{% endfor %}</tr>
+          <tr><th scope="row">Scientific cell volume</th>{% for item in comparison.structures %}<td><span class="math-inline" data-tex="{{ item.scientific_volume_tex }}">{{ item.scientific_volume_fallback }}</span>{% if item.code == 'HCP' %}<small class="comparison-detail">Primitive cell</small>{% endif %}</td>{% endfor %}</tr>
+          <tr><th scope="row">Educational cell / prism volume</th>{% for item in comparison.structures %}<td><span class="math-inline" data-tex="{{ item.educational_volume_tex }}">{{ item.educational_volume_fallback }}</span></td>{% endfor %}</tr>
+          <tr><th scope="row">Lattice geometry</th>{% for item in comparison.structures %}<td><span class="math-inline" data-tex="{{ item.geometry_tex }}">{{ item.geometry_fallback }}</span></td>{% endfor %}</tr>
+        </tbody>
+        <tbody>
+          <tr class="comparison-group"><th colspan="5" scope="colgroup">Packing &amp; Neighbours</th></tr>
+          <tr><th scope="row">Coordination number</th>{% for item in comparison.structures %}<td>{{ item.coordination_number }}</td>{% endfor %}</tr>
+          <tr><th scope="row">Coordination polyhedron</th>{% for item in comparison.structures %}<td>{{ item.coordination_polyhedron }}</td>{% endfor %}</tr>
+          <tr><th scope="row">Atomic packing factor</th>{% for item in comparison.structures %}<td>{{ '%.1f'|format(item.packing_factor * 100) }}%{% if item.code == 'HCP' %} <small>(ideal)</small>{% endif %}</td>{% endfor %}</tr>
+          <tr><th scope="row">Nearest-neighbour distance</th>{% for item in comparison.structures %}<td><span class="math-inline" data-tex="{{ item.nearest_tex }}">{{ item.nearest_fallback }}</span></td>{% endfor %}</tr>
+          <tr><th scope="row">Touching-radius relation</th>{% for item in comparison.structures %}<td><span class="math-inline" data-tex="{{ item.radius_tex }}">{{ item.radius_fallback }}</span></td>{% endfor %}</tr>
+          <tr><th scope="row">Packing character</th>{% for item in comparison.structures %}<td>{{ item.packing_character }}</td>{% endfor %}</tr>
+        </tbody>
+        <tbody>
+          <tr class="comparison-group"><th colspan="5" scope="colgroup">Layer &amp; Local Structure</th></tr>
+          <tr><th scope="row">Stacking sequence</th>{% for item in comparison.structures %}<td>{{ item.stacking }}</td>{% endfor %}</tr>
+          <tr><th scope="row">Contact direction</th>{% for item in comparison.structures %}<td>{{ item.contact_direction }}</td>{% endfor %}</tr>
+          <tr><th scope="row">Site roles shown by Explorer</th>{% for item in comparison.structures %}<td>{{ item.site_roles }}</td>{% endfor %}</tr>
+          <tr><th scope="row">Crystal repetition in Explorer</th>{% for item in comparison.structures %}<td>{{ item.repetition }}</td>{% endfor %}</tr>
+        </tbody>
+        <tbody>
+          <tr class="comparison-group"><th colspan="5" scope="colgroup">Symmetry &amp; Real Material Example</th></tr>
+          <tr><th scope="row">Representative phase space group</th>{% for item in comparison.structures %}<td>{{ item.space_group_symbol|replace('63', '6₃') }} <span class="comparison-muted">(No. {{ item.space_group_number }})</span></td>{% endfor %}</tr>
+          <tr><th scope="row">Representative material</th>{% for item in comparison.structures %}<td>{{ item.material_name }} <span class="comparison-muted">({{ item.material_symbol }})</span></td>{% endfor %}</tr>
+          <tr><th scope="row">Example lattice parameters</th>{% for item in comparison.structures %}<td><span class="comparison-detail">a = {{ '%.4f'|format(item.material_lattice_a) }} Å</span>{% if item.material_lattice_c is not none %}<span class="comparison-detail">c = {{ '%.4f'|format(item.material_lattice_c) }} Å</span><span class="comparison-detail">c/a = {{ '%.4f'|format(item.material_lattice_c_over_a) }}</span>{% endif %}</td>{% endfor %}</tr>
+          <tr><th scope="row">Example calculated density</th>{% for item in comparison.structures %}<td>{{ item.material_symbol }}: {{ '%.3f'|format(item.material_density_g_cm3) }} g/cm³{% if item.material_atomic_mass_note %}<small class="comparison-detail">Representative Po-209 mass</small>{% endif %}</td>{% endfor %}</tr>
+        </tbody>
+      </table>
+    </div>
+    <p class="comparison-note">HCP uses 2 primitive basis atoms, 6 effective atoms per educational prism and 17 visible sites. These are different counts. Its prism volume is three times the primitive volume. Packing relations here describe ideal HCP; the Explorer recalculates non-ideal geometry. Material examples use the catalog’s cited parameters, including magnesium’s measured c/a.</p>
+  </section>
+</main>
+{% endblock %}
+
+{% block scripts %}
+<script defer src="{{ url_for('static', filename='vendor/katex/katex.min.js') }}"></script>
+<script defer src="{{ url_for('static', filename='js/math.js') }}"></script>
+<script defer src="{{ url_for('static', filename='js/compare-table.js') }}"></script>
+<script type="module" src="{{ url_for('static', filename='js/compare-viewers.js') }}"></script>
+{% endblock %}
